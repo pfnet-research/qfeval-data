@@ -2,7 +2,7 @@ PROJECT_NAME := qfeval_data
 RUN := uv run
 
 .PHONY: check
-check: test lint-pysen
+check: test lint
 
 .PHONY: install
 install:
@@ -18,6 +18,10 @@ doctest:
 
 .PHONY: pytest
 pytest:
+	$(RUN) pytest --doctest-modules tests -m "not gpu"
+
+.PHONY: pytest-gpu
+pytest-gpu:
 	$(RUN) pytest --doctest-modules tests
 
 .PHONY: test-cov

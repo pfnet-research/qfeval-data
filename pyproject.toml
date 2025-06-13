@@ -1,10 +1,20 @@
 [project]
 name = "qfeval_data"
 version = "0.1.0"
-description = "Add your description here"
+description = "Data structures for quantitative finance"
 readme = "README.md"
-requires-python = ">=3.8.1"
-dependencies = []
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=1.5.0,<2.0.0",
+    "numpy>=1.24.0,<2.0.0",
+    "torch",
+    "qfeval-functions",
+]
+
+[project.optional-dependencies]
+plot = [
+  "matplotlib>=3.8.3"
+]
 
 [dependency-groups]
 dev = [
@@ -15,6 +25,8 @@ dev = [
     "pyproject-flake8==7.0.0",
     "pytest>=8.3.5",
     "pytest-cov>=5.0.0",
+    "qfeval-data[plot]",
+    "scipy",
 ]
 
 [tool.black]
