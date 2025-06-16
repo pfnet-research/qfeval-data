@@ -15,7 +15,7 @@ qfeval-data provides data frames specifically designed for efficiently handling 
 ## Installation
 
 ```bash
-pip install qfeval_functions
+pip install qfeval_data
 ```
 
 ## Usage
