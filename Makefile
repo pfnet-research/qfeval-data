@@ -18,11 +18,11 @@ doctest:
 
 .PHONY: pytest
 pytest:
-	$(RUN) pytest --doctest-modules tests -m "not gpu"
+	$(RUN) pytest tests -m "not gpu"
 
 .PHONY: pytest-gpu
 pytest-gpu:
-	$(RUN) pytest --doctest-modules tests
+	$(RUN) pytest tests
 
 .PHONY: test-cov
 test-cov:
