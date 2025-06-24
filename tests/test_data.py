@@ -1,8 +1,8 @@
 import io
 import pickle
 import random
-from math import nan
 import typing
+from math import nan
 
 import numpy as np
 import pandas as pd
