@@ -246,7 +246,7 @@ class Data(object):
                 device = v.device
             else:
                 assert v.device == device
-            tensors[k] = tensors[k][timestamps_index, :][:, symbols_index]
+            tensors[k] = tensors[k][timestamps_index, :][:, symbols_index]  # type: ignore # TODO(masanori): fix type error
         result.__tensors = tensors
 
         return result
