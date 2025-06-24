@@ -25,8 +25,8 @@ try:
     _plt.rcParams["legend.framealpha"] = 1.0
     _plt.rcParams["legend.fontsize"] = 10
 except ImportError:
-    matplotlib = None
-    _plt = None
+    matplotlib = None  # type:ignore[assignment]
+    _plt = None  # type:ignore[assignment]
 
 
 class Layer(object):
@@ -38,7 +38,7 @@ class Layer(object):
 
 def plot_dataframe(
     df: pd.DataFrame, **kwargs: typing.Any
-) -> typing.List[matplotlib.axes.Axes]:
+) -> typing.List[matplotlib.axes.Axes]:  # type:ignore[return]
     ax = df.plot(**kwargs)
     # If a legend exists.
     if ax.get_legend() is not None:
@@ -69,7 +69,9 @@ class Figure(object):
     def __init__(
         self,
         figure: typing.Union[
-            None, matplotlib.axes.Axes, matplotlib.figure.Figure
+            None,
+            matplotlib.axes.Axes,  # type:ignore[valid-type,valid-type]
+            matplotlib.figure.Figure,  # type:ignore[valid-type,valid-type]
         ] = None,
     ):
         if matplotlib is None:
@@ -88,17 +90,17 @@ class Figure(object):
             )
 
     @property
-    def figure(self) -> matplotlib.figure.Figure:
+    def figure(self) -> matplotlib.figure.Figure:  # type:ignore[return]
         return self.__figure
 
     @property
-    def axes(self) -> typing.List[matplotlib.axes.Axes]:
+    def axes(self) -> typing.List[matplotlib.axes.Axes]:  # type:ignore[return]
         return list(
             sorted(self.figure.axes, key=lambda x: float(-x.get_position().y1))
         )
 
     @property
-    def primary_axes(self) -> matplotlib.axes.Axes:
+    def primary_axes(self) -> matplotlib.axes.Axes:  # type:ignore[return]
         if len(self.figure.axes) == 0:
             self.figure.add_subplot()
         return self.axes[0]
@@ -106,7 +108,9 @@ class Figure(object):
     def show(self) -> None:
         self.figure.show()
 
-    def append_axes(self, scale: float = 0.4) -> matplotlib.axes.Axes:
+    def append_axes(
+        self, scale: float = 0.4
+    ) -> matplotlib.axes.Axes:  # type:ignore[return]
         hspace = self.figure.get_constrained_layout_pads()[3]
         params = matplotlib.figure.SubplotParams()
         height = params.top - params.bottom

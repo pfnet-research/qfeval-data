@@ -23,8 +23,8 @@ try:
     import matplotlib
     from matplotlib import pyplot as plt
 except ImportError:
-    matplotlib = None
-    plt = None
+    matplotlib = None  # type:ignore[assignment]
+    plt = None  # type:ignore[assignment]
 
 
 from qfeval_functions import functions
