@@ -26,7 +26,7 @@ pytest-gpu:
 
 .PHONY: test-cov
 test-cov:
-	$(RUN) pytest --cov=$(PROJECT_NAME) --cov-report=xml
+	$(RUN) pytest --cov=$(PROJECT_NAME) --cov-report=xml -m "not gpu"
 
 .PHONY: lint
 lint: lint-black lint-isort flake8 mypy
