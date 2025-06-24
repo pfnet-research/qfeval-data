@@ -3,7 +3,7 @@ name = "qfeval_data"
 version = "0.1.0"
 description = "Data structures for quantitative finance"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.13" # TODO (masanori): Support python 3.13 (pandas 2.0.0+). also update CI
 dependencies = [
     "pandas>=1.5.0,<2.0.0",
     "numpy>=1.24.0,<2.0.0",
