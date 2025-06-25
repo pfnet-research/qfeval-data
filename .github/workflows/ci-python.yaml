@@ -29,6 +29,15 @@ jobs:
           - '"pandas==1.5.0" "numpy==1.24.0"'
           - '"pandas>=1.5.0,<2.0.0" "numpy>=1.24.0,<2.0.0"'
           - '"pandas>=2.0.0" "numpy>=2.0.0"'
+        exclude:
+          - python-version: "3.12"
+            pandas-and-numpy-version: '"pandas==1.5.0" "numpy==1.24.0"'
+          - python-version: "3.12"
+            pandas-and-numpy-version: '"pandas>=1.5.0,<2.0.0" "numpy>=1.24.0,<2.0.0"'
+          - python-version: "3.13"
+            pandas-and-numpy-version: '"pandas==1.5.0" "numpy==1.24.0"'
+          - python-version: "3.13"
+            pandas-and-numpy-version: '"pandas>=1.5.0,<2.0.0" "numpy>=1.24.0,<2.0.0"'
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
