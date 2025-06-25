@@ -495,7 +495,7 @@ class TestData:
         df = pd.read_csv(io.StringIO(csv))
         data = Data.from_dataframe(df)
         actual_df = data.weight.to_matrix()
-        assert actual_df.to_csv(line_terminator="\n") == expected
+        assert actual_df.to_csv(lineterminator="\n") == expected
 
     def test_missing_to_matrix(self) -> None:
         csv = """timestamp,symbol,return,weight
@@ -507,7 +507,7 @@ class TestData:
         df = pd.read_csv(io.StringIO(csv))
         data = Data.from_dataframe(df)
         actual_df = data.weight.to_matrix()
-        assert actual_df.to_csv(line_terminator="\n") == expected
+        assert actual_df.to_csv(lineterminator="\n") == expected
 
     def test_rename(self) -> None:
         data = Data.from_dataframe(self.create_simple_dataframe())
@@ -834,7 +834,7 @@ class TestData:
                 np.timedelta64(2, "D"), origin=np.datetime64("2018-01-01")
             )
             .to_dataframe()
-            .to_csv(index=False, line_terminator="\n")
+            .to_csv(index=False, lineterminator="\n")
             == "timestamp,symbol,open,high,low,close\n"
             + "2018-01-01,AAPL,154.0,162.0,154.0,160.0\n"
             + "2018-01-03,AAPL,159.0,161.0,154.0,159.0\n"
@@ -849,7 +849,7 @@ class TestData:
         assert (
             data.weekly(origin=np.datetime64("2018-01-01"))
             .to_dataframe()
-            .to_csv(index=False, line_terminator="\n")
+            .to_csv(index=False, lineterminator="\n")
             == "timestamp,symbol,open,high,low,close\n"
             + "2018-01-01,AAPL,154.0,163.0,154.0,163.0\n"
             + "2018-01-08,AAPL,161.0,177.0,160.0,162.0\n"
