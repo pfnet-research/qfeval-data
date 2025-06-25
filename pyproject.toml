@@ -19,7 +19,7 @@ plot = [
 
 [dependency-groups]
 dev = [
-    "black>=24.10.0",
+    "black==24.10.0",
     "flake8==7.0.0",
     "isort==5.13.2",
     "mypy==1.9.0",
