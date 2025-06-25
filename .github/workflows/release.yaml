@@ -54,7 +54,7 @@ jobs:
     strategy:
       # NOTE: Only one version should be set (It is aimed to reduce the cost to change versions)
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.13"]
 
     steps:
       - name: Determine the tag name based on the branch name

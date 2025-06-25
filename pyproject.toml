@@ -4,10 +4,9 @@ version = "0.1.0"
 description = "Data structures for quantitative finance"
 readme = "README.md"
 # Don't forget to fix the badge in README.md after changing requires-python
-# TODO (masanori): Support python 3.12, 3.13 (pandas 2.0.0+). also update CI
-requires-python = ">=3.9,<3.12"
+requires-python = ">=3.9,<3.14"
 dependencies = [
-    "pandas>=1.5.0,<2.0.0",
+    "pandas>=1.5.0",
     "numpy>=1.24.0,<2.0.0",
     "torch",
     "qfeval-functions",
@@ -20,7 +19,7 @@ plot = [
 
 [dependency-groups]
 dev = [
-    "black==24.3.0",
+    "black>=24.10.0",
     "flake8==7.0.0",
     "isort==5.13.2",
     "mypy==1.9.0",
@@ -33,7 +32,7 @@ dev = [
 
 [tool.black]
 line-length = 80
-target-version = ['py311']
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
 exclude = '/(__pycache__|__init__\.py|\.git|\.cache|\.mypy_cache|docs|build|dist|\.venv)/'
 
 [tool.isort]

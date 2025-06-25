@@ -1,5 +1,5 @@
 # qfeval-data
-[![python](https://img.shields.io/badge/python-%3E=3.9,%3C3.12-blue.svg)](https://pypi.org/project/qfeval_data/)
+[![python](https://img.shields.io/badge/python-%3E=3.9,%3C3.14-blue.svg)](https://pypi.org/project/qfeval_data/)
 [![pypi](https://img.shields.io/pypi/v/qfeval_data.svg)](https://pypi.org/project/qfeval_data/)
 [![CI](https://github.com/pfnet-research/qfeval-data/actions/workflows/ci-python.yaml/badge.svg)](https://github.com/pfnet-research/qfeval-data/actions/workflows/ci-python.yaml)
 [![codecov](https://codecov.io/gh/pfnet-research/qfeval-data/graph/badge.svg?token=5A02B1JV7V)](https://codecov.io/gh/pfnet-research/qfeval-data)
