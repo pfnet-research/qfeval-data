@@ -27,8 +27,7 @@ jobs:
         platform: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.9, "3.10", "3.11", "3.12", "3.13"] # TODO (masanori): add 3.12, 3.13 when it is available
         pandas-and-numpy-version:
-          - '"pandas==1.5.0" "numpy==1.24.0"'
-          - '"pandas>=1.5.0,<2.0.0" "numpy>=1.24.0,<2.0.0"'
+          - '"pandas>=1.0.0,<2.0.0" "numpy>=1.0.0,<2.0.0"'
           - '"pandas>=2.0.0" "numpy>=2.0.0"'
         exclude:
           - python-version: "3.12"
