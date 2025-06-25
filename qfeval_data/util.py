@@ -169,7 +169,27 @@ def floor_time(
 
 def time_origin(d: np.timedelta64) -> np.datetime64:
     unit, _ = np.datetime_data(d)
+    unit = typing.cast(
+        typing.Literal[
+            "Y",
+            "M",
+            "W",
+            "D",
+            "h",
+            "m",
+            "s",
+            "ms",
+            "us",
+            "μs",
+            "ns",
+            "ps",
+            "fs",
+            "as",
+        ],
+        unit,
+    )
     if unit in ("M", "Y"):
+        unit = typing.cast(typing.Literal["M", "Y"], unit)
         # qfeval uses 1000-01-01 as the datetime origin for monthly/yearly
         # ticks so as to show multiples of 10/100/1000 years for a long term
         # x-axis.

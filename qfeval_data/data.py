@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import datetime
 import fnmatch
 import io
 import itertools
@@ -1497,6 +1498,25 @@ class Data(object):
                 # first candlestick of a month would start with its previous
                 # month.
                 unit, _ = np.datetime_data(delta)
+                unit = typing.cast(
+                    typing.Literal[
+                        "Y",
+                        "M",
+                        "W",
+                        "D",
+                        "h",
+                        "m",
+                        "s",
+                        "ms",
+                        "us",
+                        "μs",
+                        "ns",
+                        "ps",
+                        "fs",
+                        "as",
+                    ],
+                    unit,
+                )
                 label_ticks = util.ceil_time(
                     timestamps[tick_indices], np.timedelta64(1, unit)
                 )
@@ -1521,8 +1541,14 @@ class Data(object):
             "m": [(30, 10), (20, 5), (10, 5), (5, 1), (2, 1), (1, 1)],
             "s": [(30, 10), (20, 5), (10, 5), (5, 1), (2, 1), (1, 1)],
         }
-        last_deltas = (np.timedelta64(100, "Y"), np.timedelta64(100, "Y"))
+        last_deltas: typing.Tuple[
+            np.timedelta64[datetime.timedelta | int | None],
+            np.timedelta64[datetime.timedelta | int | None],
+        ] = (np.timedelta64(100, "Y"), np.timedelta64(100, "Y"))
         for unit, sizes in deltas.items():
+            unit = typing.cast(
+                typing.Literal["Y", "M", "D", "h", "m", "s"], unit
+            )
             for major, minor in sizes:
                 major_delta = np.timedelta64(major, unit)
                 minor_delta = np.timedelta64(minor, unit)
