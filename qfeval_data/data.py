@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import datetime
 import fnmatch
 import io
 import itertools
@@ -1542,8 +1541,8 @@ class Data(object):
             "s": [(30, 10), (20, 5), (10, 5), (5, 1), (2, 1), (1, 1)],
         }
         last_deltas: typing.Tuple[
-            np.timedelta64[datetime.timedelta | int | None],
-            np.timedelta64[datetime.timedelta | int | None],
+            np.timedelta64,
+            np.timedelta64,
         ] = (np.timedelta64(100, "Y"), np.timedelta64(100, "Y"))
         for unit, sizes in deltas.items():
             unit = typing.cast(
