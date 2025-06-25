@@ -24,7 +24,8 @@ jobs:
       max-parallel: 5
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.9, "3.10", "3.11"] # TODO (masanori): add 3.12, 3.13 when it is available
+        python-version: [3.9, "3.10", "3.11", "3.12", "3.13"] # TODO (masanori): add 3.12, 3.13 when it is available
+        pandas-version: ["==1.5.0", ">=1.5.0,<2.0.0", ">=2.0.0"]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -41,6 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync --dev
+          uv run pip install -U "pandas${{ matrix.pandas-version }}"
       - name: Test
         run: |
           uv run black --check --diff --quiet .
