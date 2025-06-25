@@ -1667,8 +1667,8 @@ class Data(object):
         dest_unit = np.datetime_data(delta)[0]
         timestamps = util.floor_time(self.timestamps, delta, origin, offset)
         timestamps = timestamps.astype(f"datetime64[{dest_unit}]")
-        timestamps, group_ids = np.unique(timestamps, return_inverse=True)
-        group_ids = torch.tensor(group_ids, device=self.device)
+        timestamps, _group_ids = np.unique(timestamps, return_inverse=True)
+        group_ids = torch.tensor(_group_ids, device=self.device)
 
         tensors = {}
         for k, v in self.__tensors.items():
