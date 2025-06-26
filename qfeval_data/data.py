@@ -1497,6 +1497,25 @@ class Data(object):
                 # first candlestick of a month would start with its previous
                 # month.
                 unit, _ = np.datetime_data(delta)
+                unit = typing.cast(
+                    typing.Literal[
+                        "Y",
+                        "M",
+                        "W",
+                        "D",
+                        "h",
+                        "m",
+                        "s",
+                        "ms",
+                        "us",
+                        "μs",
+                        "ns",
+                        "ps",
+                        "fs",
+                        "as",
+                    ],
+                    unit,
+                )
                 label_ticks = util.ceil_time(
                     timestamps[tick_indices], np.timedelta64(1, unit)
                 )
@@ -1521,8 +1540,14 @@ class Data(object):
             "m": [(30, 10), (20, 5), (10, 5), (5, 1), (2, 1), (1, 1)],
             "s": [(30, 10), (20, 5), (10, 5), (5, 1), (2, 1), (1, 1)],
         }
-        last_deltas = (np.timedelta64(100, "Y"), np.timedelta64(100, "Y"))
+        last_deltas: typing.Tuple[
+            np.timedelta64,
+            np.timedelta64,
+        ] = (np.timedelta64(100, "Y"), np.timedelta64(100, "Y"))
         for unit, sizes in deltas.items():
+            unit = typing.cast(
+                typing.Literal["Y", "M", "D", "h", "m", "s"], unit
+            )
             for major, minor in sizes:
                 major_delta = np.timedelta64(major, unit)
                 minor_delta = np.timedelta64(minor, unit)
@@ -1642,8 +1667,8 @@ class Data(object):
         dest_unit = np.datetime_data(delta)[0]
         timestamps = util.floor_time(self.timestamps, delta, origin, offset)
         timestamps = timestamps.astype(f"datetime64[{dest_unit}]")
-        timestamps, group_ids = np.unique(timestamps, return_inverse=True)
-        group_ids = torch.tensor(group_ids, device=self.device)
+        timestamps, _group_ids = np.unique(timestamps, return_inverse=True)
+        group_ids = torch.tensor(_group_ids, device=self.device)
 
         tensors = {}
         for k, v in self.__tensors.items():
