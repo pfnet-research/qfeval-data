@@ -462,6 +462,22 @@ class TestData:
             data.count(axis="symbol").open.array, [2, 1, 1]
         )
 
+    def test_min_max(self) -> None:
+        data = Data.from_dataframe(self.create_simple_dataframe())
+        # Overall
+        np.testing.assert_allclose(data.min().open.array, 100.0)
+        np.testing.assert_allclose(data.max().open.array, 200.0)
+        # Along timestamp (per symbol)
+        np.testing.assert_allclose(data.min(axis=0).open.array, [100.0, 190.0])
+        np.testing.assert_allclose(data.max(axis=0).open.array, [110.0, 200.0])
+        # Along symbol (per timestamp)
+        np.testing.assert_allclose(
+            data.min(axis=1).open.array, [100.0, 110.0, 190.0]
+        )
+        np.testing.assert_allclose(
+            data.max(axis=1).open.array, [200.0, 110.0, 190.0]
+        )
+
     def test_aggregation_with_nan(self) -> None:
         """Test if every aggregation function should not fail even if no valid
         values exist.
@@ -473,6 +489,8 @@ class TestData:
         data.var()
         data.std()
         data.count()
+
+    # moved to tests/data/test_first.py
 
     def test_to_dataframe(self) -> None:
         expected_df = self.create_simple_dataframe()
