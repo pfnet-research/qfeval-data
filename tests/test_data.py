@@ -490,8 +490,6 @@ class TestData:
         data.std()
         data.count()
 
-    # moved to tests/data/test_first.py
-
     def test_to_dataframe(self) -> None:
         expected_df = self.create_simple_dataframe()
         data = Data.from_dataframe(expected_df)
