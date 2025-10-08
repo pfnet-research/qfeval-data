@@ -1869,7 +1869,7 @@ class Data(object):
         tensors: typing.Dict[str, torch.Tensor] = {}
         for k, v in ag.items:
             x = v
-            for d in sorted(ag.dim):
+            for d in ag.dim:
                 x = functions.nanmin(x, dim=d, keepdim=True).values
             if not ag.keepdim:
                 for d in sorted(ag.dim, reverse=True):
@@ -1882,7 +1882,7 @@ class Data(object):
         tensors: typing.Dict[str, torch.Tensor] = {}
         for k, v in ag.items:
             x = v
-            for d in sorted(ag.dim):
+            for d in ag.dim:
                 x = functions.nanmax(x, dim=d, keepdim=True).values
             if not ag.keepdim:
                 for d in sorted(ag.dim, reverse=True):
@@ -1971,7 +1971,7 @@ class Data(object):
         ag = self.__aggregate(axis, "last")
         tensors: typing.Dict[str, torch.Tensor] = {}
         for k, v in ag.items:
-            for d in sorted(ag.dim):
+            for d in ag.dim:
                 v = (functions.ffill(v, d) if skipna else v).narrow(d, -1, 1)
             tensors[k] = functions.nansum(v, dim=ag.dim, keepdim=ag.keepdim)
         return self.from_tensors(tensors, ag.timestamps, ag.symbols)
