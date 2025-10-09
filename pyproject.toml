@@ -1,6 +1,6 @@
 [project]
 name = "qfeval_data"
-version = "0.1.0"
+version = "0.1.1"
 description = "Data structures for quantitative finance"
 readme = "README.md"
 # Don't forget to fix the badge in README.md after changing requires-python
