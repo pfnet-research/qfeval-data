@@ -26,3 +26,11 @@ pip install qfeval_data
 
 ## Usage
 TBD
+
+## リリース手順
+
+1. `release/X.X.X` のブランチを作成する。
+2. version.yaml (Bump) のワークフローが実行され、`Bumping version from Z.Z.Z to X.X.X` というタイトルのプルリクエストが作成されるので、これをマージする。
+3. `release/X.X.X` ブランチを `master` にマージするプルリクエスト（タイトルは `Release/X.X.X` のままで OK）を作成する。
+4. 他の人から Approval を得て、`Release/X.X.X` のプルリクエストのマージをする。
+5. [Release ワークフロー](https://github.com/pfnet-research/qfeval-data/actions/workflows/release.yaml) が走るのでこれの完了を待ち、 PyPI の [qfeval/data](https://pypi.org/project/qfeval_data/#history) で新しいバージョンが追加されたことを確認する。
