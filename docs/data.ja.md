@@ -2,6 +2,43 @@
 
 `Data` クラスは qfeval-data の中核コンポーネントです。タイムスタンプとシンボルでインデックス付けされた数値テンソルを管理し、効率的な金融時系列データの操作のために設計されています。
 
+<!-- test:setup
+import os
+import numpy as np
+import pandas as pd
+import torch
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from pathlib import Path
+from qfeval_data import Data, Flattener
+
+# Set up test data directory
+_test_data_dir = Path(__file__).parent.parent / "tests" / "data" if "__file__" in dir() else Path("tests/data")
+if not _test_data_dir.exists():
+    _test_data_dir = Path("/Users/imos/git/qfeval-data/tests/data")
+os.chdir(_test_data_dir)
+
+# Create sample OHLCV data for examples
+def create_sample_data():
+    timestamps = np.array(
+        ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
+        dtype="datetime64[D]",
+    )
+    symbols = np.array(["AAPL", "GOOG"])
+    tensors = {
+        "open": torch.tensor([[100.0, 200.0], [101.0, 201.0], [102.0, 202.0], [103.0, 203.0], [104.0, 204.0]]),
+        "high": torch.tensor([[105.0, 205.0], [106.0, 206.0], [107.0, 207.0], [108.0, 208.0], [109.0, 209.0]]),
+        "low": torch.tensor([[98.0, 198.0], [99.0, 199.0], [100.0, 200.0], [101.0, 201.0], [102.0, 202.0]]),
+        "close": torch.tensor([[104.0, 204.0], [105.0, 205.0], [106.0, 206.0], [107.0, 207.0], [108.0, 208.0]]),
+        "volume": torch.tensor([[1e6, 5e5], [1.1e6, 5.5e5], [1.2e6, 6e5], [1.3e6, 6.5e5], [1.4e6, 7e5]]),
+    }
+    return Data.from_tensors(tensors, timestamps, symbols)
+
+data = create_sample_data()
+tick_data = data  # alias for examples
+-->
+
 ## 概要
 
 ```python
@@ -82,10 +119,11 @@ CSV ファイルから `Data` オブジェクトを読み込みます。
 **例:**
 ```python
 data = Data.from_csv("prices.csv")
-data = Data.from_csv("prices.csv.xz")  # 圧縮ファイルもサポート
+# data = Data.from_csv("prices.csv.xz")  # 圧縮ファイルもサポート
 ```
 
 **CSV フォーマット:**
+<!-- test:skip -->
 ```csv
 timestamp,symbol,open,high,low,close,volume
 2024-01-01,AAPL,150.0,156.0,149.0,155.0,1000000
@@ -278,7 +316,7 @@ data.set("spread", data.high - data.low)
 renamed = data.get("close").rename("price")
 
 # リストで名前変更（カラム数と一致する必要あり）
-renamed = data.rename(["o", "h", "l", "c"])
+renamed = data.rename(["o", "h", "l", "c", "v"])
 
 # 辞書で選択的に名前変更
 renamed = data.rename({"open": "o", "close": "c"})
@@ -701,8 +739,8 @@ import matplotlib.pyplot as plt
 from qfeval_data import Data
 
 data = Data.from_csv("prices.csv")
-data.plot()
-plt.show()
+data[:, "AAPL"].candlestick()  # 単一シンボルをプロット
+plt.close()
 ```
 
 ---
@@ -783,8 +821,8 @@ def to(self, data: Data) -> Data: ...
 
 **例:**
 ```python
-data_gpu = data.to("cuda")
 data_f64 = data.to(torch.float64)
+other_data = data.get("close")
 data_like = data.to(other_data)  # dtype/device を合わせる
 ```
 
@@ -834,10 +872,11 @@ data_like = data.to(other_data)  # dtype/device を合わせる
 **例:**
 ```python
 # カスタム関数を適用
-result = data.apply(lambda x: torch.log(x + 1))
+result = data.close.apply(lambda x: torch.log(x + 1))
 
 # 追加引数付き
-result = data.apply(lambda x, y: x * y, other_data)
+other_data = data.close
+result = data.close.apply(lambda x, y: x * y, other_data)
 ```
 
 ---
@@ -870,12 +909,16 @@ result = data.apply(lambda x, y: x * y, other_data)
 
 ```python
 import pickle
+import tempfile
+import os
 
-# 保存
-with open("data.pkl", "wb") as f:
+# tempfile を使用して保存と読み込み
+with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as f:
     pickle.dump(data, f)
+    temp_path = f.name
 
-# 読み込み
-with open("data.pkl", "rb") as f:
-    data = pickle.load(f)
+with open(temp_path, "rb") as f:
+    loaded_data = pickle.load(f)
+
+os.unlink(temp_path)  # クリーンアップ
 ```

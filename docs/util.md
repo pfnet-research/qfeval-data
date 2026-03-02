@@ -10,7 +10,6 @@ from qfeval_data import util
 
 ## Overview
 
-<!-- test:skip -->
 ```python
 from qfeval_data import util
 ```
@@ -29,12 +28,11 @@ Convert a PyTorch tensor to a NumPy array.
 **Returns:** `np.ndarray`
 
 **Example:**
-<!-- test:skip -->
 ```python
 import torch
 from qfeval_data import util
 
-tensor = torch.tensor([1.0, 2.0, 3.0], device="cuda")
+tensor = torch.tensor([1.0, 2.0, 3.0])
 array = util.to_numpy(tensor)
 print(type(array))  # <class 'numpy.ndarray'>
 ```
@@ -56,15 +54,14 @@ Create a tensor filled with NaN values.
 **Returns:** `torch.Tensor`
 
 **Example:**
-<!-- test:skip -->
 ```python
 import torch
 from qfeval_data import util
 
-ref = torch.tensor([1.0, 2.0], device="cuda")
+ref = torch.tensor([1.0, 2.0])
 nans = util.nans((3, 4), like=ref)
 print(nans.shape)   # torch.Size([3, 4])
-print(nans.device)  # cuda:0
+print(nans.device)  # cpu
 ```
 
 **Notes:**
@@ -253,12 +250,10 @@ print(util.sha1(torch.tensor([1.0, 2.0])))  # works with tensors
 Run garbage collection and clear GPU memory.
 
 **Example:**
-<!-- test:skip -->
 ```python
 from qfeval_data import util
 
 # Free memory after processing
-del large_data
 util.gc()
 ```
 
@@ -297,8 +292,9 @@ print(util.torch_device("cuda:0")) # cuda:0
 
 The module defines type variables for generic typing:
 
-<!-- test:skip -->
 ```python
+import typing
+
 # Generic type
 T = typing.TypeVar("T")
 

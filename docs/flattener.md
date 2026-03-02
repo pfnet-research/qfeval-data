@@ -27,11 +27,12 @@ def create_sample_data():
 data = create_sample_data()
 prices = data
 features = data.get(["open", "high", "low", "close"])
+flattener = Flattener(data)
+flat_tensor = flattener.flatten(data.close)
 -->
 
 ## Overview
 
-<!-- test:skip -->
 ```python
 from qfeval_data import Flattener
 ```
@@ -56,11 +57,10 @@ Create a Flattener from one or more Data objects.
 - A pair is considered valid if it has no NaN values across all input Data
 
 **Example:**
-<!-- test:skip -->
 ```python
 from qfeval_data import Data, Flattener
 
-data = Data.from_csv("prices.csv")
+# data is created in setup
 flattener = Flattener(data)
 ```
 
@@ -88,12 +88,8 @@ Convert a Data object to a flat tensor.
 - Output tensor shape: `(B, *extra_dims)` where B=number of valid pairs
 
 **Example:**
-<!-- test:skip -->
 ```python
-data = Data.from_csv("prices.csv")
-flattener = Flattener(data)
-
-# Flatten to batch tensor
+# data and flattener are created in setup
 flat_tensor = flattener.flatten(data.close)
 print(flat_tensor.shape)  # (B,) where B = number of valid timestamp/symbol pairs
 ```
@@ -119,10 +115,9 @@ Convert a flat tensor back to a Data object.
 - Output Data shape: `(T, S, *extra_dims)`
 
 **Example:**
-<!-- test:skip -->
 ```python
-# After processing...
-output_tensor = model(flat_tensor)  # shape: (B,)
+# After processing (simulate model output)
+output_tensor = flat_tensor * 2  # shape: (B,)
 
 # Convert back to Data
 predictions = flattener.unflatten(output_tensor, name="prediction")
@@ -142,7 +137,6 @@ Get the timestamp index for each element in the flattened representation.
 **Returns:** `torch.Tensor` with shape `(batch_size,)`
 
 **Example:**
-<!-- test:skip -->
 ```python
 ts_idx = flattener.timestamp_indexes()
 # ts_idx[i] = timestamp index of the i-th element in flattened tensor
@@ -157,7 +151,6 @@ Get the symbol index for each element in the flattened representation.
 **Returns:** `torch.Tensor` with shape `(batch_size,)`
 
 **Example:**
-<!-- test:skip -->
 ```python
 sym_idx = flattener.symbol_indexes()
 # sym_idx[i] = symbol index of the i-th element in flattened tensor
@@ -167,28 +160,26 @@ sym_idx = flattener.symbol_indexes()
 
 ## Complete Example
 
-<!-- test:skip -->
 ```python
 import torch
 from qfeval_data import Data, Flattener
 
-# Load data
-data = Data.from_csv("prices.csv")
-print(f"Original shape: {data.shape}")  # e.g., (252, 100)
+# data is created in setup
+print(f"Original shape: {data.shape}")  # (4, 2)
 
 # Create flattener
 flattener = Flattener(data)
 
 # Flatten closing prices
 prices = flattener.flatten(data.close)
-print(f"Flattened shape: {prices.shape}")  # e.g., (25000,)
+print(f"Flattened shape: {prices.shape}")  # (8,)
 
 # Do some processing
 log_prices = torch.log(prices)
 
 # Unflatten back to Data
 result = flattener.unflatten(log_prices, "log_price")
-print(f"Result shape: {result.shape}")  # (252, 100)
+print(f"Result shape: {result.shape}")  # (4, 2)
 
 # Get index mapping
 ts_idx = flattener.timestamp_indexes()
@@ -200,29 +191,27 @@ print(f"First element: timestamp={ts_idx[0].item()}, symbol={sym_idx[0].item()}"
 
 ## Machine Learning Workflow
 
-<!-- test:skip -->
 ```python
 import torch
 import torch.nn as nn
 from qfeval_data import Data, Flattener
 
-# Load and prepare data
-data = Data.from_csv("prices.csv")
-features = data.get(["open", "high", "low", "close", "volume"])
-target = data.close.shift(-1).pct_change()  # Next day return
+# data is created in setup
+feature = data.close  # Single feature for simplicity
+target = data.close.pct_change()  # Daily return
 
 # Create flattener from both (ensures alignment)
-flattener = Flattener(features, target)
+flattener = Flattener(feature, target)
 
 # Flatten for training
-X = flattener.flatten(features)  # shape: (B, 5)
+X = flattener.flatten(feature).unsqueeze(-1)  # shape: (B, 1)
 y = flattener.flatten(target)    # shape: (B,)
 
 # Train model
-model = nn.Linear(5, 1)
+model = nn.Linear(1, 1)
 optimizer = torch.optim.Adam(model.parameters())
 
-for epoch in range(100):
+for epoch in range(10):  # Short training for example
     pred = model(X).squeeze()
     loss = ((pred - y) ** 2).mean()
     optimizer.zero_grad()
@@ -235,7 +224,7 @@ with torch.no_grad():
     pred_data = flattener.unflatten(predictions, "prediction")
 
 # Now pred_data has the same timestamp/symbol structure as original data
-print(pred_data.to_dataframe())
+print(pred_data.shape)
 ```
 
 ---

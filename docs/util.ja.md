@@ -2,6 +2,12 @@
 
 `qfeval_data.util` モジュールは、配列操作、時間計算、その他のユーティリティのためのヘルパー関数を提供します。
 
+<!-- test:setup
+import numpy as np
+import torch
+from qfeval_data import util
+-->
+
 ## 概要
 
 ```python
@@ -26,7 +32,7 @@ PyTorch テンソルを NumPy 配列に変換します。
 import torch
 from qfeval_data import util
 
-tensor = torch.tensor([1.0, 2.0, 3.0], device="cuda")
+tensor = torch.tensor([1.0, 2.0, 3.0])
 array = util.to_numpy(tensor)
 print(type(array))  # <class 'numpy.ndarray'>
 ```
@@ -52,10 +58,10 @@ NaN 値で埋められたテンソルを作成します。
 import torch
 from qfeval_data import util
 
-ref = torch.tensor([1.0, 2.0], device="cuda")
+ref = torch.tensor([1.0, 2.0])
 nans = util.nans((3, 4), like=ref)
 print(nans.shape)   # torch.Size([3, 4])
-print(nans.device)  # cuda:0
+print(nans.device)  # cpu
 ```
 
 **注意:**
@@ -248,7 +254,6 @@ print(util.sha1(torch.tensor([1.0, 2.0])))  # テンソルでも動作
 from qfeval_data import util
 
 # 処理後にメモリを解放
-del large_data
 util.gc()
 ```
 
@@ -288,6 +293,8 @@ print(util.torch_device("cuda:0")) # cuda:0
 モジュールはジェネリック型付けのための型変数を定義しています:
 
 ```python
+import typing
+
 # ジェネリック型
 T = typing.TypeVar("T")
 

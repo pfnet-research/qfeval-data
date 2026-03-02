@@ -3,10 +3,21 @@
 The `Data` class is the core component of qfeval-data. It manages numerical tensors indexed by timestamps and symbols, designed for efficient financial time series manipulation.
 
 <!-- test:setup
+import os
 import numpy as np
 import pandas as pd
 import torch
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from pathlib import Path
 from qfeval_data import Data, Flattener
+
+# Set up test data directory
+_test_data_dir = Path(__file__).parent.parent / "tests" / "data" if "__file__" in dir() else Path("tests/data")
+if not _test_data_dir.exists():
+    _test_data_dir = Path("/Users/imos/git/qfeval-data/tests/data")
+os.chdir(_test_data_dir)
 
 # Create sample OHLCV data for examples
 def create_sample_data():
@@ -29,7 +40,6 @@ data = create_sample_data()
 
 ## Overview
 
-<!-- test:skip -->
 ```python
 from qfeval_data import Data
 ```
@@ -106,10 +116,9 @@ Load a `Data` object from a CSV file.
 **Returns:** `Data`
 
 **Example:**
-<!-- test:skip -->
 ```python
 data = Data.from_csv("prices.csv")
-data = Data.from_csv("prices.csv.xz")  # Supports compressed files
+# data = Data.from_csv("prices.csv.xz")  # Supports compressed files
 ```
 
 **CSV Format:**
@@ -301,13 +310,12 @@ Rename columns.
 **Returns:** `Data`
 
 **Examples:**
-<!-- test:skip -->
 ```python
 # Rename single column (when Data has one column)
 renamed = data.get("close").rename("price")
 
 # Rename with list (must match column count)
-renamed = data.rename(["o", "h", "l", "c"])
+renamed = data.rename(["o", "h", "l", "c", "v"])
 
 # Rename with dict (selective)
 renamed = data.rename({"open": "o", "close": "c"})
@@ -628,10 +636,9 @@ Downsample data to lower frequency. OHLC columns are handled specially:
 - `aggregation_f` (callable): Aggregation function for non-OHLC columns
 
 **Example:**
-<!-- test:skip -->
 ```python
-# Convert tick data to daily OHLCV
-daily = tick_data.daily()
+# Convert tick data to daily OHLCV (no-op if already daily)
+daily = data.daily()
 
 # Weekly data with timezone offset
 weekly = data.weekly(offset=np.timedelta64(9, "h"))
@@ -650,10 +657,9 @@ Generic downsampling to arbitrary frequency.
 - `aggregation_f` (callable): Aggregation function
 
 **Example:**
-<!-- test:skip -->
 ```python
-# 15-minute bars
-bars_15m = data.downsample(np.timedelta64(15, "m"))
+# Downsample to 2-day bars
+bars_2d = data.downsample(np.timedelta64(2, "D"))
 ```
 
 ---
@@ -739,14 +745,13 @@ OHLC candlestick chart. Requires `open`, `high`, `low`, `close` columns.
 - `linewidth` (`float`): Wick line width (default: 0.5)
 
 **Example:**
-<!-- test:skip -->
 ```python
 import matplotlib.pyplot as plt
 from qfeval_data import Data
 
 data = Data.from_csv("prices.csv")
-data.plot()
-plt.show()
+data[:, "AAPL"].candlestick()  # Plot single symbol
+plt.close()
 ```
 
 ---
@@ -864,10 +869,9 @@ def to(self, data: Data) -> Data: ...
 ```
 
 **Examples:**
-<!-- test:skip -->
 ```python
-data_gpu = data.to("cuda")
 data_f64 = data.to(torch.float64)
+other_data = data.get("close")
 data_like = data.to(other_data)  # Match dtype/device
 ```
 
@@ -926,13 +930,13 @@ Apply function to tensors.
 **Returns:** `Data`
 
 **Example:**
-<!-- test:skip -->
 ```python
 # Apply custom function
-result = data.apply(lambda x: torch.log(x + 1))
+result = data.close.apply(lambda x: torch.log(x + 1))
 
 # With additional argument
-result = data.apply(lambda x, y: x * y, other_data)
+other_data = data.close
+result = data.close.apply(lambda x, y: x * y, other_data)
 ```
 
 ---
@@ -1029,15 +1033,18 @@ Get size of dimension(s).
 
 The `Data` class supports Python's pickle protocol:
 
-<!-- test:skip -->
 ```python
 import pickle
+import tempfile
+import os
 
-# Save
-with open("data.pkl", "wb") as f:
+# Save and load using tempfile
+with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as f:
     pickle.dump(data, f)
+    temp_path = f.name
 
-# Load
-with open("data.pkl", "rb") as f:
-    data = pickle.load(f)
+with open(temp_path, "rb") as f:
+    loaded_data = pickle.load(f)
+
+os.unlink(temp_path)  # Clean up
 ```
