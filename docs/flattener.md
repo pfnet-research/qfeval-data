@@ -2,8 +2,36 @@
 
 The `Flattener` class assists conversion between `Data` objects (with timestamp/symbol indices) and flat `torch.Tensor` objects (with a single batch index).
 
+<!-- test:setup
+import numpy as np
+import pandas as pd
+import torch
+from qfeval_data import Data, Flattener
+
+# Create sample data for examples
+def create_sample_data():
+    timestamps = np.array(
+        ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04"],
+        dtype="datetime64[D]",
+    )
+    symbols = np.array(["AAPL", "GOOG"])
+    tensors = {
+        "open": torch.tensor([[100.0, 200.0], [101.0, 201.0], [102.0, 202.0], [103.0, 203.0]]),
+        "high": torch.tensor([[105.0, 205.0], [106.0, 206.0], [107.0, 207.0], [108.0, 208.0]]),
+        "low": torch.tensor([[98.0, 198.0], [99.0, 199.0], [100.0, 200.0], [101.0, 201.0]]),
+        "close": torch.tensor([[104.0, 204.0], [105.0, 205.0], [106.0, 206.0], [107.0, 207.0]]),
+        "volume": torch.tensor([[1e6, 5e5], [1.1e6, 5.5e5], [1.2e6, 6e5], [1.3e6, 6.5e5]]),
+    }
+    return Data.from_tensors(tensors, timestamps, symbols)
+
+data = create_sample_data()
+prices = data
+features = data.get(["open", "high", "low", "close"])
+-->
+
 ## Overview
 
+<!-- test:skip -->
 ```python
 from qfeval_data import Flattener
 ```
@@ -28,6 +56,7 @@ Create a Flattener from one or more Data objects.
 - A pair is considered valid if it has no NaN values across all input Data
 
 **Example:**
+<!-- test:skip -->
 ```python
 from qfeval_data import Data, Flattener
 
@@ -59,6 +88,7 @@ Convert a Data object to a flat tensor.
 - Output tensor shape: `(B, *extra_dims)` where B=number of valid pairs
 
 **Example:**
+<!-- test:skip -->
 ```python
 data = Data.from_csv("prices.csv")
 flattener = Flattener(data)
@@ -89,6 +119,7 @@ Convert a flat tensor back to a Data object.
 - Output Data shape: `(T, S, *extra_dims)`
 
 **Example:**
+<!-- test:skip -->
 ```python
 # After processing...
 output_tensor = model(flat_tensor)  # shape: (B,)
@@ -111,6 +142,7 @@ Get the timestamp index for each element in the flattened representation.
 **Returns:** `torch.Tensor` with shape `(batch_size,)`
 
 **Example:**
+<!-- test:skip -->
 ```python
 ts_idx = flattener.timestamp_indexes()
 # ts_idx[i] = timestamp index of the i-th element in flattened tensor
@@ -125,6 +157,7 @@ Get the symbol index for each element in the flattened representation.
 **Returns:** `torch.Tensor` with shape `(batch_size,)`
 
 **Example:**
+<!-- test:skip -->
 ```python
 sym_idx = flattener.symbol_indexes()
 # sym_idx[i] = symbol index of the i-th element in flattened tensor
@@ -134,6 +167,7 @@ sym_idx = flattener.symbol_indexes()
 
 ## Complete Example
 
+<!-- test:skip -->
 ```python
 import torch
 from qfeval_data import Data, Flattener
@@ -166,6 +200,7 @@ print(f"First element: timestamp={ts_idx[0].item()}, symbol={sym_idx[0].item()}"
 
 ## Machine Learning Workflow
 
+<!-- test:skip -->
 ```python
 import torch
 import torch.nn as nn

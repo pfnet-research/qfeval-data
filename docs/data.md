@@ -2,8 +2,34 @@
 
 The `Data` class is the core component of qfeval-data. It manages numerical tensors indexed by timestamps and symbols, designed for efficient financial time series manipulation.
 
+<!-- test:setup
+import numpy as np
+import pandas as pd
+import torch
+from qfeval_data import Data, Flattener
+
+# Create sample OHLCV data for examples
+def create_sample_data():
+    timestamps = np.array(
+        ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
+        dtype="datetime64[D]",
+    )
+    symbols = np.array(["AAPL", "GOOG"])
+    tensors = {
+        "open": torch.tensor([[100.0, 200.0], [101.0, 201.0], [102.0, 202.0], [103.0, 203.0], [104.0, 204.0]]),
+        "high": torch.tensor([[105.0, 205.0], [106.0, 206.0], [107.0, 207.0], [108.0, 208.0], [109.0, 209.0]]),
+        "low": torch.tensor([[98.0, 198.0], [99.0, 199.0], [100.0, 200.0], [101.0, 201.0], [102.0, 202.0]]),
+        "close": torch.tensor([[104.0, 204.0], [105.0, 205.0], [106.0, 206.0], [107.0, 207.0], [108.0, 208.0]]),
+        "volume": torch.tensor([[1e6, 5e5], [1.1e6, 5.5e5], [1.2e6, 6e5], [1.3e6, 6.5e5], [1.4e6, 7e5]]),
+    }
+    return Data.from_tensors(tensors, timestamps, symbols)
+
+data = create_sample_data()
+-->
+
 ## Overview
 
+<!-- test:skip -->
 ```python
 from qfeval_data import Data
 ```
@@ -80,12 +106,14 @@ Load a `Data` object from a CSV file.
 **Returns:** `Data`
 
 **Example:**
+<!-- test:skip -->
 ```python
 data = Data.from_csv("prices.csv")
 data = Data.from_csv("prices.csv.xz")  # Supports compressed files
 ```
 
 **CSV Format:**
+<!-- test:skip -->
 ```csv
 timestamp,symbol,open,high,low,close,volume
 2024-01-01,AAPL,150.0,156.0,149.0,155.0,1000000
@@ -273,6 +301,7 @@ Rename columns.
 **Returns:** `Data`
 
 **Examples:**
+<!-- test:skip -->
 ```python
 # Rename single column (when Data has one column)
 renamed = data.get("close").rename("price")
@@ -599,6 +628,7 @@ Downsample data to lower frequency. OHLC columns are handled specially:
 - `aggregation_f` (callable): Aggregation function for non-OHLC columns
 
 **Example:**
+<!-- test:skip -->
 ```python
 # Convert tick data to daily OHLCV
 daily = tick_data.daily()
@@ -620,6 +650,7 @@ Generic downsampling to arbitrary frequency.
 - `aggregation_f` (callable): Aggregation function
 
 **Example:**
+<!-- test:skip -->
 ```python
 # 15-minute bars
 bars_15m = data.downsample(np.timedelta64(15, "m"))
@@ -708,6 +739,7 @@ OHLC candlestick chart. Requires `open`, `high`, `low`, `close` columns.
 - `linewidth` (`float`): Wick line width (default: 0.5)
 
 **Example:**
+<!-- test:skip -->
 ```python
 import matplotlib.pyplot as plt
 from qfeval_data import Data
@@ -832,6 +864,7 @@ def to(self, data: Data) -> Data: ...
 ```
 
 **Examples:**
+<!-- test:skip -->
 ```python
 data_gpu = data.to("cuda")
 data_f64 = data.to(torch.float64)
@@ -893,6 +926,7 @@ Apply function to tensors.
 **Returns:** `Data`
 
 **Example:**
+<!-- test:skip -->
 ```python
 # Apply custom function
 result = data.apply(lambda x: torch.log(x + 1))
@@ -995,6 +1029,7 @@ Get size of dimension(s).
 
 The `Data` class supports Python's pickle protocol:
 
+<!-- test:skip -->
 ```python
 import pickle
 

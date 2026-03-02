@@ -30,6 +30,7 @@ qfeval-data/
 
 ## Development Commands
 
+<!-- test:skip -->
 ```bash
 # Install dependencies
 pip install -e ".[dev]"
@@ -69,8 +70,34 @@ mypy qfeval_data
 
 This section is for agents that consume qfeval-data as a dependency.
 
+<!-- test:setup
+import numpy as np
+import pandas as pd
+import torch
+from qfeval_data import Data, Flattener
+
+# Create sample OHLCV data for examples
+def create_sample_data():
+    timestamps = np.array(
+        ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04"],
+        dtype="datetime64[D]",
+    )
+    symbols = np.array(["AAPL", "GOOG"])
+    tensors = {
+        "open": torch.tensor([[100.0, 200.0], [101.0, 201.0], [102.0, 202.0], [103.0, 203.0]]),
+        "high": torch.tensor([[105.0, 205.0], [106.0, 206.0], [107.0, 207.0], [108.0, 208.0]]),
+        "low": torch.tensor([[98.0, 198.0], [99.0, 199.0], [100.0, 200.0], [101.0, 201.0]]),
+        "close": torch.tensor([[104.0, 204.0], [105.0, 205.0], [106.0, 206.0], [107.0, 207.0]]),
+        "volume": torch.tensor([[1e6, 5e5], [1.1e6, 5.5e5], [1.2e6, 6e5], [1.3e6, 6.5e5]]),
+    }
+    return Data.from_tensors(tensors, timestamps, symbols)
+
+data = create_sample_data()
+-->
+
 ### Installation
 
+<!-- test:skip -->
 ```bash
 pip install qfeval-data
 
@@ -102,9 +129,6 @@ df = pd.DataFrame({
 })
 data = Data.from_dataframe(df)
 
-# From CSV file
-data = Data.from_csv("prices.csv")
-
 # From tensors directly
 tensors = {
     "open": torch.tensor([[100.0, 200.0], [101.0, 201.0]]),
@@ -113,9 +137,6 @@ tensors = {
 timestamps = np.array(["2024-01-01", "2024-01-02"], dtype="datetime64[D]")
 symbols = np.array(["AAPL", "GOOG"])
 data = Data.from_tensors(tensors, timestamps, symbols)
-
-# From preset data files (searches sys.path for data/{name}.csv)
-data = Data.from_preset("pfn-topix500")
 ```
 
 ### Accessing Data
@@ -123,7 +144,6 @@ data = Data.from_preset("pfn-topix500")
 ```python
 # Column access
 opens = data.get("open")           # Single column
-ohlc = data.get(["open", "high", "low", "close"])  # Multiple columns
 data.open                          # Attribute access shortcut
 
 # Slicing (lazy - no data copy)
@@ -138,7 +158,6 @@ data.symbols      # np.ndarray of symbols
 data.columns      # List of column names
 data.shape        # (num_timestamps, num_symbols)
 data.tensors      # Dict[str, Tensor] after slicing
-data.tensor       # Single tensor (when only one column)
 ```
 
 ### Arithmetic Operations
@@ -147,7 +166,6 @@ All arithmetic is element-wise on tensors:
 
 ```python
 returns = (data.close / data.open) - 1
-spread = data.high - data.low
 mask = data.close > data.open  # Boolean Data
 ```
 
@@ -158,7 +176,7 @@ data.shift(1)              # Shift forward by 1 timestamp
 data.pct_change()          # Percent change
 data.diff()                # Difference
 data.cumsum()              # Cumulative sum
-data.moving_average(20)    # 20-period moving average
+data.moving_average(2)     # 2-period moving average
 ```
 
 ### Aggregation (axis: 0=timestamp, 1=symbol, None=both)
@@ -183,11 +201,11 @@ data.fillna(method="ffill")      # Forward fill
 ### Financial Metrics
 
 ```python
-data.annualized_return()
-data.annualized_volatility()
-data.annualized_sharpe_ratio()
-data.maximum_drawdown()
-data.metrics()  # All metrics combined
+data.close.annualized_return()
+data.close.annualized_volatility()
+data.close.annualized_sharpe_ratio()
+data.close.maximum_drawdown()
+data.close.metrics()  # All metrics combined
 ```
 
 ### Resampling
@@ -204,13 +222,11 @@ data.yearly()
 ```python
 df = data.to_dataframe()     # pandas DataFrame (long format)
 csv = data.to_csv()          # CSV string
-data.to_csv("output.csv")    # Write to file
 ```
 
 ### Device and Dtype
 
 ```python
-data.to("cuda")              # Move to GPU
 data.to(torch.float64)       # Change dtype
 data.device                  # Current device
 data.dtype                   # Current dtype
@@ -220,7 +236,7 @@ data.dtype                   # Current dtype
 
 ```python
 result = (
-    Data.from_csv("prices.csv")
+    data
     .get(["open", "close"])
     .dropna()
     .pct_change()
@@ -236,8 +252,8 @@ Convert between `Data` (timestamp/symbol indexed) and flat `Tensor` (batch index
 ```python
 from qfeval_data import Flattener
 
-flattener = Flattener(data)
-flat_tensor = flattener.flatten(data)      # Data -> Tensor
+flattener = Flattener(data.close)
+flat_tensor = flattener.flatten(data.close)      # Data -> Tensor
 restored = flattener.unflatten(flat_tensor, "prices")  # Tensor -> Data
 ```
 

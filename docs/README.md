@@ -14,6 +14,7 @@
 
 ## Installation
 
+<!-- test:skip -->
 ```bash
 pip install qfeval-data
 
@@ -23,14 +24,18 @@ pip install qfeval-data[plot]
 
 ## Quick Start
 
+<!-- test:setup
+import numpy as np
+import pandas as pd
+import torch
+from qfeval_data import Data
+-->
+
 ```python
 from qfeval_data import Data
 import pandas as pd
 
-# Load from CSV
-data = Data.from_csv("prices.csv")
-
-# Or from DataFrame
+# Create from DataFrame
 df = pd.DataFrame({
     "timestamp": ["2024-01-01", "2024-01-01", "2024-01-02", "2024-01-02"],
     "symbol": ["AAPL", "GOOG", "AAPL", "GOOG"],

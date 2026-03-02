@@ -2,6 +2,36 @@
 
 This document provides practical examples and common usage patterns for qfeval-data.
 
+<!-- test:setup
+import numpy as np
+import pandas as pd
+import torch
+from qfeval_data import Data, Flattener
+
+# Create sample OHLCV data for examples
+def create_sample_data():
+    timestamps = np.array(
+        ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05",
+         "2024-01-08", "2024-01-09", "2024-01-10", "2024-01-11", "2024-01-12"],
+        dtype="datetime64[D]",
+    )
+    symbols = np.array(["AAPL", "GOOG", "MSFT"])
+    np.random.seed(42)
+    n_ts, n_sym = len(timestamps), len(symbols)
+    tensors = {
+        "open": torch.tensor(np.random.randn(n_ts, n_sym) * 5 + 150, dtype=torch.float32),
+        "high": torch.tensor(np.random.randn(n_ts, n_sym) * 5 + 155, dtype=torch.float32),
+        "low": torch.tensor(np.random.randn(n_ts, n_sym) * 5 + 145, dtype=torch.float32),
+        "close": torch.tensor(np.random.randn(n_ts, n_sym) * 5 + 152, dtype=torch.float32),
+        "volume": torch.tensor(np.random.randn(n_ts, n_sym) * 1e5 + 1e6, dtype=torch.float32),
+    }
+    return Data.from_tensors(tensors, timestamps, symbols)
+
+data = create_sample_data()
+tick_data = data  # alias for examples
+daily = data  # alias for examples
+-->
+
 ## Table of Contents
 
 1. [Loading Data](#loading-data)
@@ -19,6 +49,7 @@ This document provides practical examples and common usage patterns for qfeval-d
 
 ### From CSV File
 
+<!-- test:skip -->
 ```python
 from qfeval_data import Data
 
@@ -33,6 +64,7 @@ data = Data.from_csv("prices.csv.xz")
 ```
 
 **Expected CSV format:**
+<!-- test:skip -->
 ```csv
 timestamp,symbol,open,high,low,close,volume
 2024-01-02,AAPL,185.5,186.2,184.1,185.8,50000000
@@ -94,6 +126,7 @@ print(data.embedding.tensor.shape)  # (1, 2, 3)
 
 ### Accessing Data
 
+<!-- test:skip -->
 ```python
 from qfeval_data import Data
 
@@ -134,6 +167,7 @@ typical_price = (data.high + data.low + data.close) / 3
 
 ### Filtering
 
+<!-- test:skip -->
 ```python
 # Boolean filtering
 up_days = data[data.close > data.open]  # Non-matching become NaN
@@ -151,6 +185,7 @@ filled = data.fillna(method="ffill")
 
 ### Rolling Calculations
 
+<!-- test:skip -->
 ```python
 # Moving average
 ma_20 = data.close.moving_average(window=20)
@@ -182,6 +217,7 @@ next_return = data.close.shift(-1).pct_change()
 
 ### Resampling
 
+<!-- test:skip -->
 ```python
 # Daily data from tick data
 daily = tick_data.daily()
@@ -202,6 +238,7 @@ bars_15m = data.downsample(np.timedelta64(15, "m"))
 
 ### Single Stock Metrics
 
+<!-- test:skip -->
 ```python
 # Get metrics for a single stock
 apple = data[:, "AAPL"]
@@ -214,6 +251,7 @@ print(metrics.to_dataframe())
 
 ### Cross-sectional Analysis
 
+<!-- test:skip -->
 ```python
 # Compare metrics across all stocks
 all_metrics = data.close.metrics()
@@ -228,6 +266,7 @@ print(f"Best Sharpe: {best_symbol}")
 
 ### Portfolio Returns
 
+<!-- test:skip -->
 ```python
 import torch
 
@@ -245,6 +284,7 @@ cumulative = (1 + portfolio_returns).cumprod()
 
 ### Correlation Analysis
 
+<!-- test:skip -->
 ```python
 # Calculate returns
 returns = data.close.pct_change()
@@ -276,6 +316,7 @@ scaled = (data.close - min_val) / (max_val - min_val)
 
 ### Creating Features
 
+<!-- test:skip -->
 ```python
 def create_features(data):
     """Create common technical features."""
@@ -314,6 +355,7 @@ features = create_features(data)
 
 ### Merging Data Sources
 
+<!-- test:skip -->
 ```python
 # Merge multiple data sources
 prices = Data.from_csv("prices.csv")
@@ -332,6 +374,7 @@ combined = prices.merge(fundamentals)
 
 ### Basic Plots
 
+<!-- test:skip -->
 ```python
 import matplotlib.pyplot as plt
 from qfeval_data import Data
@@ -347,6 +390,7 @@ plt.show()
 
 ### Candlestick Chart
 
+<!-- test:skip -->
 ```python
 # Explicit candlestick
 apple.candlestick()
@@ -364,6 +408,7 @@ plt.show()
 
 ### Line Plots
 
+<!-- test:skip -->
 ```python
 # Single series
 apple.close.line()
@@ -380,6 +425,7 @@ plt.show()
 
 ### Technical Indicators
 
+<!-- test:skip -->
 ```python
 # Moving average overlay
 fig, ax = plt.subplots()
@@ -396,6 +442,7 @@ plt.show()
 
 ### Multiple Subplots
 
+<!-- test:skip -->
 ```python
 fig, axes = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
 
@@ -422,6 +469,7 @@ plt.show()
 
 ### Preparing Data for PyTorch
 
+<!-- test:skip -->
 ```python
 import torch
 from qfeval_data import Data, Flattener
@@ -450,6 +498,7 @@ print(f"Target shape: {y.shape}")
 
 ### Training Loop
 
+<!-- test:skip -->
 ```python
 import torch.nn as nn
 import torch.optim as optim
@@ -487,6 +536,7 @@ for epoch in range(100):
 
 ### Making Predictions
 
+<!-- test:skip -->
 ```python
 # Make predictions
 model.eval()
@@ -507,6 +557,7 @@ print(f"Mean Absolute Error: {error.mean().tensor.item():.6f}")
 
 ### Time Series Split
 
+<!-- test:skip -->
 ```python
 # Split by time
 split_date = "2023-07-01"
@@ -522,6 +573,7 @@ print(f"Train: {train_data.shape}, Test: {test_data.shape}")
 
 ### Cross-sectional Operations
 
+<!-- test:skip -->
 ```python
 # Rank within each timestamp
 def rank_cross_section(data):
@@ -535,6 +587,7 @@ ranked = rank_cross_section(data.close.pct_change())
 
 ### Sector Analysis
 
+<!-- test:skip -->
 ```python
 # Assuming you have sector mapping
 sector_map = {"AAPL": "Tech", "GOOG": "Tech", "JPM": "Finance", "XOM": "Energy"}
@@ -550,6 +603,7 @@ tech_avg = tech_data.close.mean(axis=1).rename("tech_avg")
 
 ### Universe Filtering
 
+<!-- test:skip -->
 ```python
 # Filter by liquidity
 avg_volume = data.volume.mean(axis=0)
@@ -565,6 +619,7 @@ valid_symbols = data.symbols[valid_mask.cpu().numpy()]
 
 ### Pair Trading
 
+<!-- test:skip -->
 ```python
 # Calculate spread between two stocks
 spread = data[:, "AAPL"].close - data[:, "GOOG"].close
